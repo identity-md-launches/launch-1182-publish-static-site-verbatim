@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Kiln · ZTO</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23000'/%3E%3Ctext x='32' y='42' font-family='monospace' font-weight='700' font-size='24' fill='%23f5a623' text-anchor='middle'%3E0%E2%86%921%3C/text%3E%3C/svg%3E">
+<meta name="description" content="The Kiln is a Uniswap v4 pool for ZTO where every Pepeolithic you hold cuts your fee, and every trade without one feeds a fire that only ever buys Pepeolithic. No owner. No off switch.">
+<meta property="og:title" content="The Kiln · ZTO">
+<meta property="og:description" content="Every trade without a Pepeolithic feeds it. Every Pepeolithic you hold starves it. It only ever buys one thing.">
+<meta property="og:image" content="img/og.jpg">
+<script>document.documentElement.classList.add("js")</script>
+<style>
+@font-face { font-family: "Rubik Dirt"; src: url(fonts/rubik-dirt.woff2) format("woff2"); font-display: swap; }
+@font-face { font-family: "Space Grotesk"; src: url(fonts/space-grotesk.woff2) format("woff2"); font-weight: 300 700; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url(fonts/space-mono.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url(fonts/space-mono-bold.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --rock-0: #0d0805; --rock-1: #17100a; --rock-2: #241810; --rock-3: #3a2717;
+  --ochre: #d9a441; --ochre-hi: #f2c462; --red: #b5482a; --red-hi: #d4633d;
+  --char: #15100c; --chalk: #efe6d6; --chalk-dim: #b9aa90; --amber: #f5a623; --moss: #a5d78a; --ember: #ff8a3d;
+  --slab: 20px 28px 22px 30px / 28px 20px 30px 22px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; color: var(--chalk); background: var(--rock-0); overflow-x: hidden; font: 17px/1.55 "Space Grotesk", system-ui, sans-serif;
+  background-image: radial-gradient(1200px 700px at 50% 0, rgba(255,138,61,.07), transparent 70%); }
+a { color: var(--ochre-hi); }
+img { max-width: 100%; display: block; }
+.wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+.mono { font-family: "Space Mono", ui-monospace, monospace; }
+.label { font: 400 11px/1.4 "Space Mono", ui-monospace, monospace; letter-spacing: .18em; text-transform: uppercase; color: var(--ochre); }
+h1, h2, h3 { margin: 0; font-weight: 400; }
+h1, h2 { font-family: "Rubik Dirt", "Space Grotesk", sans-serif; }
+h2 { font-size: clamp(2rem, 5.2vw, 3.5rem); line-height: 1.02; color: var(--ochre-hi); letter-spacing: .01em; }
+h3 { font: 700 1.1rem/1.25 "Space Grotesk", sans-serif; color: var(--chalk); }
+p { margin: 0 0 1em; }
+.lede { font-size: 1.16rem; color: var(--chalk); max-width: 56ch; margin: 0; }
+.dim { color: var(--chalk-dim); }
+section { padding: 84px 0 12px; position: relative; }
+.head { display: grid; gap: 12px; margin-bottom: 28px; }
+html.js .reveal { opacity: 0; transform: translateY(22px); transition: opacity .6s, transform .6s cubic-bezier(.2,.8,.3,1); }
+html.js .reveal.in { opacity: 1; transform: none; }
+.glow { position: fixed; inset: 0; z-index: 0; pointer-events: none; --gx: 50vw; --gy: 30vh;
+  background: radial-gradient(420px 420px at var(--gx) var(--gy), rgba(255,150,70,.08), transparent 70%); }
+nav, header, section, footer { position: relative; z-index: 1; }
+
+nav { position: sticky; top: 0; z-index: 50; background: rgba(13,8,5,.86); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(217,164,65,.14); }
+nav .wrap { display: flex; align-items: center; gap: 18px; height: 56px; }
+.logo { cursor: pointer; border: 0; background: none; padding: 0; font: 400 24px/1 "Rubik Dirt", sans-serif; color: var(--ochre-hi); text-decoration: none; }
+.logo b { color: var(--amber); font-weight: 400; }
+nav .links { display: flex; gap: 18px; margin-left: 8px; }
+nav .links a { font: 400 11px "Space Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--chalk-dim); text-decoration: none; }
+nav .links a:hover { color: var(--ochre-hi); }
+.navw { margin-left: auto; }
+.btn { display: inline-block; cursor: pointer; border: 0; text-decoration: none; font: 700 14px "Space Mono", monospace; letter-spacing: .04em; padding: 13px 20px; border-radius: 14px 18px 14px 20px / 18px 14px 20px 14px; background: var(--ochre-hi); color: var(--char); box-shadow: 0 3px 0 #8a6420, 0 10px 24px rgba(0,0,0,.45); }
+.btn:active { transform: translateY(2px); }
+.btn.ghost { background: rgba(13,8,5,.65); color: var(--chalk); box-shadow: 0 0 0 1px rgba(239,230,214,.3); }
+.btn.red { background: var(--red-hi); color: #fff3e6; box-shadow: 0 3px 0 #6d2412, 0 10px 24px rgba(0,0,0,.45); }
+.btn.sm { font-size: 12px; padding: 9px 13px; }
+.btn[disabled] { opacity: .55; cursor: not-allowed; }
+.chip { cursor: pointer; border: 0; font: 700 12px "Space Mono", monospace; color: var(--chalk); background: rgba(13,8,5,.6); padding: 9px 13px; border-radius: 12px; box-shadow: 0 0 0 1px rgba(239,230,214,.2); }
+.chip.on { background: var(--red); color: #fff3e6; }
+.wchip { display: inline-flex; align-items: center; gap: 6px; font: 700 11px "Space Mono", monospace; letter-spacing: .06em; padding: 9px 12px; border-radius: 12px; border: 1px solid rgba(217,164,65,.45); background: rgba(13,8,5,.6); color: var(--chalk); cursor: pointer; }
+
+.hero { position: relative; height: min(calc(100vh - 56px), 860px); min-height: 620px; overflow: hidden; background: #1a110a url(img/fire.jpg) center 40% / cover no-repeat; }
+.hero .torch { position: absolute; inset: 0; pointer-events: none; --mx: 50%; --my: 55%;
+  background: radial-gradient(circle 620px at var(--mx) var(--my), rgba(255,160,70,.10) 0, rgba(13,8,5,.38) 40%, rgba(13,8,5,.93) 100%); animation: flicker 3.6s infinite; }
+@keyframes flicker { 0%,100% { opacity: 1 } 42% { opacity: .93 } 47% { opacity: 1 } 71% { opacity: .96 } }
+.hero .fade { position: absolute; left: 0; right: 0; bottom: 0; height: 220px; background: linear-gradient(transparent, var(--rock-0)); pointer-events: none; }
+.embers { position: absolute; inset: 0; pointer-events: none; }
+.embers i { position: absolute; bottom: -10px; width: var(--s); height: var(--s); border-radius: 50%; background: #ffb65a; box-shadow: 0 0 8px 2px rgba(255,150,60,.7); opacity: 0; animation: ember var(--d) linear var(--w) infinite; left: var(--l); }
+@keyframes ember { 0% { opacity: 0; transform: translate(0, 0) } 10% { opacity: .9 } 100% { opacity: 0; transform: translate(var(--x), -78vh) } }
+.hero .inner { position: relative; height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding-bottom: 90px; }
+.hero h1 { font-size: clamp(2.8rem, 10.4vw, 8.4rem); line-height: .92; color: var(--ochre-hi); text-shadow: 0 3px 0 rgba(60,20,8,.75), 0 0 46px rgba(0,0,0,.55); }
+.hero h1 span { color: var(--ember); }
+.hero .sub { font-size: clamp(1.05rem, 2.1vw, 1.42rem); max-width: 32em; line-height: 1.42; text-shadow: 0 2px 12px #000; margin: 0; }
+.hero .sub b { color: var(--ochre-hi); font-weight: 500; }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 12px; }
+.stats { position: absolute; left: 0; right: 0; bottom: 26px; }
+.stats .wrap { display: flex; flex-wrap: wrap; gap: 8px 30px; }
+.stats div { font: 400 11px "Space Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--chalk-dim); }
+.stats b { display: block; font: 400 30px/1 "Rubik Dirt", sans-serif; color: var(--ochre-hi); letter-spacing: 0; }
+
+.slab { background: linear-gradient(160deg, rgba(58,39,23,.72), rgba(30,20,12,.82)); border: 1px solid rgba(217,164,65,.17); border-radius: var(--slab); padding: 22px; box-shadow: inset 0 1px 0 rgba(255,220,160,.06), 0 14px 40px rgba(0,0,0,.35); }
+.slab p:last-child { margin-bottom: 0; }
+.slab > .label { display: block; margin-bottom: 8px; }
+.grid { display: grid; gap: 16px; }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.tile b { display: block; font: 400 2.4rem/1 "Rubik Dirt", sans-serif; color: var(--ochre-hi); margin-bottom: 6px; }
+.tile span { color: var(--chalk-dim); font-size: .95rem; }
+table.tiers { width: 100%; border-collapse: collapse; font: 400 13px "Space Mono", monospace; margin-top: 8px; }
+table.tiers td, table.tiers th { padding: 8px 6px; border-bottom: 1px solid rgba(217,164,65,.14); text-align: left; }
+table.tiers th { font-weight: 400; color: var(--ochre); letter-spacing: .12em; text-transform: uppercase; font-size: 10px; }
+table.tiers tr.me td { color: var(--ochre-hi); }
+table.tiers td:last-child, table.tiers th:last-child { text-align: right; }
+
+.card { background: linear-gradient(160deg, rgba(44,28,16,.93), rgba(16,10,6,.95)); border: 1px solid rgba(242,196,98,.45); border-radius: var(--slab); padding: 20px; box-shadow: 0 0 0 1px rgba(0,0,0,.4), 0 18px 50px rgba(0,0,0,.5); }
+.card .top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 14px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--red-hi); margin-right: 8px; animation: pulse 1.5s infinite; }
+.dot.off { background: var(--chalk-dim); animation: none; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(212,99,61,.7) } 70% { box-shadow: 0 0 0 9px rgba(212,99,61,0) } 100% { box-shadow: 0 0 0 0 rgba(212,99,61,0) } }
+.field { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; background: rgba(13,8,5,.55); border: 1px solid rgba(217,164,65,.2); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+.field input { width: 100%; min-width: 0; border: 0; background: none; color: var(--chalk); font: 400 1.5rem "Space Mono", monospace; outline: none; }
+.field input::placeholder { color: rgba(239,230,214,.3); }
+.field .tok { font: 700 13px "Space Mono", monospace; color: var(--ochre-hi); white-space: nowrap; }
+.field .bal { grid-column: 1 / -1; font: 400 11px "Space Mono", monospace; color: var(--chalk-dim); letter-spacing: .06em; }
+.field .bal button { border: 0; background: none; color: var(--ochre); font: inherit; cursor: pointer; padding: 0; margin-left: 6px; letter-spacing: inherit; }
+.flip { display: flex; justify-content: center; margin: -4px 0 6px; }
+.flip button { cursor: pointer; border: 1px solid rgba(217,164,65,.35); background: rgba(13,8,5,.8); color: var(--ochre-hi); border-radius: 50%; width: 36px; height: 36px; font-size: 18px; line-height: 1; }
+.fee { display: grid; gap: 6px; font: 400 12px "Space Mono", monospace; color: var(--chalk-dim); margin: 10px 0 14px; }
+.fee div { display: flex; justify-content: space-between; gap: 10px; }
+.fee b { color: var(--chalk); font-weight: 400; }
+.fee .you { color: var(--ochre-hi); }
+.err { margin-top: 10px; font: 400 12px "Space Mono", monospace; color: #ff8a65; }
+.fine { margin-top: 10px; font: 400 10px/1.5 "Space Mono", monospace; letter-spacing: .04em; color: var(--chalk-dim); }
+.inv { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.inv button { cursor: pointer; border: 1px solid rgba(217,164,65,.35); background: rgba(13,8,5,.6); color: var(--chalk); font: 700 12px "Space Mono", monospace; padding: 8px 12px; border-radius: 10px; }
+.inv button:hover { border-color: var(--ochre-hi); color: var(--ochre-hi); }
+.inv button.sel { background: var(--red); color: #fff3e6; border-color: var(--red); }
+.kv { display: grid; grid-template-columns: 1fr auto; gap: 6px 14px; font: 400 13px "Space Mono", monospace; }
+.kv span { color: var(--chalk-dim); }
+.kv b { font-weight: 400; color: var(--ochre-hi); text-align: right; overflow-wrap: anywhere; }
+.why { padding-top: 40px; }
+.why .grid { grid-template-columns: repeat(4, 1fr); }
+.why .slab { padding: 18px 20px; }
+.why .slab b { display: block; font: 400 1.15rem/1.2 "Rubik Dirt", sans-serif; color: var(--ember); margin-bottom: 8px; }
+.why .slab p { font-size: .95rem; color: var(--chalk); }
+.why .big { font-size: clamp(1.25rem, 2.4vw, 1.7rem); line-height: 1.35; color: var(--chalk); max-width: 46ch; margin: 0 0 22px; }
+.why .big b { color: var(--ochre-hi); font-weight: 500; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; margin-top: 10px; }
+.tile2 { position: relative; border-radius: 14px 18px 14px 20px / 18px 14px 20px 14px; overflow: hidden; background: #1a110a; border: 1px solid rgba(217,164,65,.3); cursor: pointer; text-align: left; padding: 0; color: var(--chalk); }
+.tile2 .pic { aspect-ratio: 1; background: #1a110a center / cover no-repeat; display: grid; place-items: center; font: 400 2.4rem "Rubik Dirt", sans-serif; color: var(--ochre-hi); }
+.tile2 .pic { position: relative; }
+.tile2 .pic img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tile2 .pic.q::after { content: "?"; animation: wob 2.6s ease-in-out infinite; }
+.tile2 .pic.q img { opacity: 0; }
+@keyframes wob { 50% { transform: rotate(6deg) scale(1.06) } }
+.tile2 .cap { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 7px 9px; font: 700 11px "Space Mono", monospace; }
+.tile2 .cap span { color: var(--chalk-dim); font-weight: 400; }
+.tile2.sel { border-color: var(--red-hi); box-shadow: 0 0 0 2px var(--red-hi), 0 0 24px rgba(212,99,61,.35); }
+.tile2 .os { position: absolute; top: 6px; right: 6px; font: 700 9px "Space Mono", monospace; letter-spacing: .08em; color: var(--chalk); background: rgba(13,8,5,.7); padding: 3px 6px; border-radius: 6px; text-decoration: none; }
+@media (max-width: 900px) { .why .grid { grid-template-columns: 1fr 1fr; } }
+.rule { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; margin-bottom: 14px; }
+.rule i { font: 400 1.6rem/1 "Rubik Dirt", sans-serif; color: var(--ember); font-style: normal; }
+footer { padding: 70px 0 60px; border-top: 1px solid rgba(217,164,65,.14); margin-top: 90px; color: var(--chalk-dim); font-size: .92rem; }
+footer .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+footer .mono { font-size: 11px; letter-spacing: .04em; overflow-wrap: anywhere; }
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); z-index: 90; max-width: min(92vw, 560px); padding: 12px 16px; border-radius: 14px; background: rgba(36,24,16,.96); color: var(--chalk); border: 1px solid rgba(217,164,65,.4); font: 400 13px/1.45 "Space Mono", monospace; opacity: 0; pointer-events: none; transition: opacity .3s, transform .3s; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.sparks { position: fixed; z-index: 95; pointer-events: none; width: 0; height: 0; }
+.sparks i { position: absolute; left: 0; top: 0; width: var(--s); height: var(--s); border-radius: 50%; background: #ffc46a; box-shadow: 0 0 10px 2px rgba(255,150,60,.75); animation: spark var(--t) cubic-bezier(.2,.8,.4,1) forwards; }
+@keyframes spark { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1) } 100% { opacity: 0; transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%)) scale(.3) } }
+.btn, .chip, .wchip, .inv button { transition: transform .12s, filter .2s; } .btn:hover, .chip:hover, .wchip:hover { filter: brightness(1.08); } .btn:active, .chip:active, .wchip:active { transform: scale(.96) translateY(1px); }
+.tile2 { transition: transform .2s, box-shadow .2s, border-color .2s; } .tile2:hover { transform: translateY(-3px); border-color: var(--ochre-hi); box-shadow: 0 12px 30px rgba(0,0,0,.45), 0 0 24px rgba(255,160,70,.15); }
+.stats b.pop, .kv b.pop { animation: pop .6s; } @keyframes pop { 40% { transform: scale(1.14); color: #fff3e6; text-shadow: 0 0 18px rgba(255,170,80,.9) } }
+.hero.fed .torch { animation: feed 1.2s ease-out, flicker 3.6s infinite 1.2s; } @keyframes feed { 0% { filter: brightness(1) } 25% { filter: brightness(1.9) } 100% { filter: brightness(1) } }
+.pill { display: inline-block; font: 700 10px "Space Mono", monospace; letter-spacing: .1em; text-transform: uppercase; padding: 4px 8px; border-radius: 8px; background: rgba(239,230,214,.1); color: var(--chalk-dim); }
+.pill.hot { background: rgba(255,138,61,.18); color: var(--ember); }
+@media (max-width: 900px) { .g3, .g2 { grid-template-columns: 1fr; } footer .wrap { grid-template-columns: 1fr; } nav .links { display: none; } .hero .inner { padding-bottom: 150px; } }
+</style>
+</head>
+<body>
+<div class="glow" id="glow"></div>
+<nav><div class="wrap">
+  <a class="logo" href="../cave-site/" aria-label="ZTO">0<b>→</b>1</a>
+  <div class="links"><a href="#trade">Trade</a><a href="#kiln">The Kiln</a><a href="#why">What this is</a><a href="#how">How it works</a><a href="#proof">Proof</a><a href="../cave-site/">Pepeolithic →</a></div>
+  <button class="wchip navw" id="navwallet">Connect wallet</button>
+</div></nav>
+
+<header class="hero" id="hero">
+  <div class="torch" id="torch"></div><div class="embers" id="embers"></div><div class="fade"></div>
+  <div class="wrap inner">
+    <span class="label" id="chainpill">ZTO · Ethereum</span>
+    <h1>The <span>Kiln</span></h1>
+    <p class="sub"><b>Every trade without a Pepeolithic feeds it. Every Pepeolithic you hold starves it.</b> It only ever buys one thing. The ZTO it collects is <b>locked, not burned</b>: it never leaves except as payment for a Pepeolithic. No owner, no off switch, no way to take the fire back out.</p>
+    <div class="cta"><a class="btn" href="#trade">Trade ZTO</a><a class="btn ghost" href="#kiln">Sell a Pepeolithic to the fire</a><a class="btn ghost" href="#how">How it works</a></div>
+  </div>
+  <div class="stats"><div class="wrap">
+    <div>kiln bid<b id="s-bid">—</b></div><div>kiln ask<b id="s-ask">—</b></div><div>in the fire<b id="s-reserve">—</b></div><div>pepeolithic held<b id="s-inv">—</b></div><div>your fee<b id="s-fee">—</b></div>
+  </div></div>
+</header>
+
+<section id="trade"><div class="wrap">
+  <div class="head reveal"><span class="label">Trade</span><h2>ETH in, ZTO out. Or back.</h2>
+    <p class="lede">A direct ETH door for ZTO. Connect a wallet and the quote already includes your pass. Swaps go through Uniswap's Universal Router; the Kiln only sets the fee.</p></div>
+  <div class="grid g2">
+    <div class="card reveal" id="swap">
+      <div class="top"><span class="label"><i class="dot" id="swapdot"></i>Swap</span><span id="swapme" class="pill">no wallet</span></div>
+      <div class="field"><input id="in" inputmode="decimal" placeholder="0.0"><span class="tok" id="intok">ETH</span><span class="bal" id="inbal"></span></div>
+      <div class="flip"><button id="flip" title="Flip direction">⇅</button></div>
+      <div class="field"><input id="out" placeholder="0.0" readonly><span class="tok" id="outtok">ZTO</span><span class="bal" id="outbal"></span></div>
+      <div class="fee" id="feebox"><div><span>Pool fee</span><b>0.20%</b></div><div><span>Kiln cut <span id="feewhy" class="dim"></span></span><b id="feecut">—</b></div><div class="you"><span>You pay</span><b id="feetot">—</b></div><div><span>Min received (1% slippage)</span><b id="minout">—</b></div></div>
+      <button class="btn" id="swapbtn" style="width:100%;text-align:center">Connect wallet</button>
+      <div class="err" id="swaperr"></div>
+      <p class="fine">Selling ZTO uses Uniswap's Permit2: the first sale asks for two approvals, then it is one transaction. Quotes come straight from the chain; price can move between quote and fill.</p>
+    </div>
+    <div class="slab reveal"><span class="label">Pool</span>
+      <div class="kv" id="poolkv"><span>Price</span><b id="p-price">—</b><span>ZTO on offer within a 10% move</span><b id="p-zto">—</b><span>ETH for sellers within a 10% move</span><b id="p-eth">—</b><span>Pool fee</span><b>0.20% to liquidity</b><span>Hook</span><b id="p-hook">—</b><span>Pool id</span><b id="p-id">—</b></div>
+      <p class="fine" style="margin-top:16px">Opened with ZTO only. Buyers bring the ETH; sellers can only draw out what buyers left. Arbitrage keeps it in line with the IMD/ZTO pool, where ZTO was born.</p>
+      <p class="fine" id="dexlink"></p>
+    </div>
+  </div>
+</div></section>
+
+<section id="kiln"><div class="wrap">
+  <div class="head reveal"><span class="label">The Kiln</span><h2>Sell a Pepeolithic to the fire. Or buy one back.</h2>
+    <p class="lede">This is the shop. Left: your pieces, sell any of them to the fire at the bid, ZTO in your wallet the same block. Right: what the fire holds, buy any of it at the ask. No listings, no waiting, no middleman.</p></div>
+  <div class="grid g2">
+    <div class="card reveal" id="sellcard">
+      <div class="top"><span class="label"><i class="dot" id="kilndot"></i>Your Pepeolithic</span><span class="pill" id="sellbid">bid —</span></div>
+      <div id="mine" class="tiles"><span class="dim" style="font-size:13px">Connect a wallet to see your pieces.</span></div>
+      <div class="field" style="margin-top:12px"><input id="sellid" inputmode="numeric" placeholder="or type a piece id"><span class="tok">#</span></div>
+      <button class="btn red" id="sellbtn" style="width:100%;text-align:center">Connect wallet</button>
+      <div class="err" id="sellerr"></div>
+      <p class="fine">Two steps: approve the piece to the Kiln, then sell. You receive the bid shown at the moment your transaction lands, in ZTO. Sending a piece to the Kiln by plain transfer is not a sale: it is gone for good.</p>
+    </div>
+    <div class="card reveal" id="buycard">
+      <div class="top"><span class="label">In the fire (locked ZTO)</span><span class="pill" id="buyask">ask —</span></div>
+      <div class="kv"><span>Reserve (real ZTO)</span><b id="k-reserve">—</b><span>Pending cut (not collected yet)</span><b id="k-claims">—</b><span>Pieces held</span><b id="k-count">—</b></div>
+      <div id="inventory" class="tiles"><span class="dim" style="font-size:13px">Loading…</span></div>
+      <p class="fine">Every piece in the fire is for sale at the ask. Tap one to pick it; the picture shows once its cave has been painted.</p>
+      <div style="display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px"><button class="btn" id="buybtn" style="text-align:center" disabled>Pick a piece</button><button class="btn ghost sm" id="collectbtn" title="Move the pending cut into the reserve. Anyone can.">Collect</button></div>
+      <div class="err" id="buyerr"></div>
+      <details style="margin-top:12px"><summary class="fine" style="cursor:pointer">Feed the fire (advanced)</summary>
+        <div class="field" style="margin-top:10px"><input id="seedamt" inputmode="decimal" placeholder="ZTO to seed"><span class="tok">ZTO</span></div>
+        <button class="btn ghost sm" id="seedbtn">Seed the reserve</button>
+        <p class="fine">Seeding raises the bid for everyone. It is a gift to the fire: no shares, no refund, no way back.</p></details>
+    </div>
+  </div>
+</div></section>
+
+<section id="why" class="why"><div class="wrap">
+  <div class="head reveal"><span class="label">What this is</span><h2>We put a fire under ZTO.</h2>
+    <p class="big"><b>The Kiln is a new ETH / ZTO pool with a hook that watches your wallet.</b> Hold Pepeolithic pieces and your swap fee drops, rung by rung, down to the bare pool fee. Hold none and the extra you pay goes into a fire that does one thing: it buys Pepeolithic from anyone who wants out, at a price it publishes every block.</p></div>
+  <div class="grid">
+    <div class="slab reveal"><b>Why it matters</b><p>Pepeolithic are a membership, not just a picture: the more you hold, the cheaper every ZTO trade. And the fire is a permanent bid under every piece, funded by trading, not by us.</p></div>
+    <div class="slab reveal"><b>Two markets, one loop</b><p>ZTO volume feeds the Pepeolithic floor. A higher floor makes the pass worth more. A pass worth more means more people trade through the cheap lane. It pulls itself along.</p></div>
+    <div class="slab reveal"><b>Built by the swarm</b><p>A Uniswap v4 hook on a swarm-made coin, written, tested and audited by the IMD swarm's own workers. As far as we know, the first NFT whose job is a fee tier on its own token.</p></div>
+    <div class="slab reveal"><b>Nobody holds the keys</b><p>No owner, no pause, no upgrade, no withdraw. We seeded it with ZTO and walked away. Nothing in the fire is burned: it is locked, and the only way ZTO leaves is as payment to someone selling a Pepeolithic. The mint is where ZTO burns; the Kiln is where it is held.</p></div>
+  </div>
+</div></section>
+
+<section id="how"><div class="wrap">
+  <div class="head reveal"><span class="label">How it works</span><h2>One pool. One fire. One rule.</h2>
+    <p class="lede">The Kiln is a Uniswap v4 hook on a fresh <b>ETH / ZTO</b> pool. It watches who is trading and charges accordingly. Whatever the fire collects, it spends on exactly one thing: buying Pepeolithic pieces from anyone who wants to sell.</p></div>
+  <div class="grid g3">
+    <div class="slab reveal"><span class="label">The pass</span><h3>Pepeolithic cuts your fee</h3>
+      <p class="dim">Every swap pays the pool's 0.20%. On top of that the Kiln takes a cut in ZTO, and the cut depends on how many Pepeolithic pieces sit in the wallet doing the swap.</p>
+      <table class="tiers" id="tiers"><tr><th>Pepeolithic</th><th>Kiln cut</th><th>You pay</th></tr>
+        <tr data-t="0"><td>0</td><td>1.30%</td><td>1.50%</td></tr><tr data-t="1"><td>1+</td><td>1.00%</td><td>1.20%</td></tr><tr data-t="3"><td>3+</td><td>0.75%</td><td>0.95%</td></tr><tr data-t="7"><td>7+ (a cave)</td><td>0.50%</td><td>0.70%</td></tr><tr data-t="12"><td>12+</td><td>0.25%</td><td>0.45%</td></tr><tr data-t="21"><td>21+ (a line)</td><td>0%</td><td>0.20%</td></tr></table>
+      <p class="fine">A pass only needs to be in the wallet during the swap. Routers are fine: the Kiln looks at the key that signed the transaction, not the router. Smart-contract wallets (Safe, account abstraction) get no pass: the pieces must sit in the signing key's own address.</p></div>
+    <div class="slab reveal"><span class="label">The fire</span><h3>Non-holders feed it. It locks, it never burns</h3>
+      <p class="dim">The cut never reaches a person. It lands in the Kiln's reserve as ZTO, locked, not burned, and stays there until a Pepeolithic is sold into it. There is no owner, no withdraw, no admin key, no upgrade. Not even the people who lit it can take it out.</p>
+      <p class="dim">Anyone can <b>collect</b> the pending cut into the reserve, and anyone can <b>seed</b> more ZTO in. Nobody can take it back.</p></div>
+    <div class="slab reveal"><span class="label">The floor</span><h3>The Kiln always bids</h3>
+      <p class="dim"><b>Bid = reserve ÷ 50.</b> Sell any Pepeolithic to the Kiln and it pays the bid instantly, in ZTO, no buyer needed. Every piece it takes in lowers the next bid 2%; every cut, seed and sale raises it.</p>
+      <p class="dim"><b>Ask = bid × 1.15.</b> Anything in its inventory is for sale at the ask. The spread stays in the fire.</p></div>
+  </div>
+</div></section>
+
+<section id="proof"><div class="wrap">
+  <div class="head reveal"><span class="label">Proof</span><h2>Read it. Nobody can change it.</h2>
+    <p class="lede">Two contracts, written and audited by the IMD swarm, deployed once. The Launcher opened the pool and created the Kiln; after that it has nothing left to do.</p></div>
+  <div class="grid g2">
+    <div class="slab reveal"><span class="label">Addresses</span>
+      <div class="kv"><span>Kiln (hook + market)</span><b id="a-kiln">—</b><span>Launcher</span><b id="a-launcher">—</b><span>ZTO</span><b id="a-zto">—</b><span>Pepeolithic</span><b id="a-pepeo">—</b><span>Uniswap v4 PoolManager</span><b id="a-pm">—</b><span>Source</span><b><a id="a-repo" href="#" target="_blank" rel="noreferrer">github</a></b></div></div>
+    <div class="slab reveal"><span class="label">Rules that cannot change</span>
+      <div class="rule"><i>1</i><div><h3>No owner</h3><p class="dim">No admin, no pause, no upgrade, no rescue. The reserve leaves only as payment to someone selling a Pepeolithic.</p></div></div>
+      <div class="rule"><i>2</i><div><h3>The pass is the key that signs</h3><p class="dim">The Kiln reads the address that signed the transaction. A smart-contract wallet is not that address, so it gets no pass. Pieces only need to be held during the swap.</p></div></div>
+      <div class="rule"><i>3</i><div><h3>Quotes are the chain's, not ours</h3><p class="dim">Bid and ask are pure functions of the reserve. This page only reads them. Sell and buy take an id and nothing else; the price is whatever holds when your transaction lands.</p></div></div>
+      <div class="rule"><i>4</i><div><h3>Exact-output swaps that only half fill revert</h3><p class="dim">Rare, harmless, and the reason this page quotes exact-input only.</p></div></div>
+    </div>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <div><a class="logo" style="font-size:26px" href="../cave-site/" aria-label="ZTO">0<b>→</b>1</a>
+    <p style="margin:10px 0 0">The Kiln, by ZTO. Written and audited by the IMD swarm.<br>Frog lit it. Nobody can put it out.</p></div>
+  <div><p class="mono" id="f-zto">ZTO · 0xd782bdea4ef02a0bd391eb9089470c8080f0a68e · Ethereum</p>
+    <p class="mono" id="f-kiln">Kiln · trust only the address in the bio</p>
+    <p><a href="../cave-site/">Pepeolithic</a> · <a href="https://zto.sites.imd.fun/" target="_blank" rel="noreferrer">zto.sites.imd.fun</a> · <a href="https://x.com/ZTO_ETH" target="_blank" rel="noreferrer">@ZTO_ETH</a> · <a href="https://imd.fun" target="_blank" rel="noreferrer">imd.fun</a></p></div>
+</div></footer>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+  // ── config: edit here or override with ?chain=sepolia&kiln=0x… ─────────────
+  const CONFIG = { chain: "mainnet", kiln: "0x3bCCc06410d2690166Da1069b767B25E859B40CC", launcher: "0xd9b5c62f5f9ccfd3608223786200e1c5522eaaa8", repo: "https://github.com/identity-md-launches/launch-1138-kiln-uniswap-v4-hook" }
+  const CHAINS = {
+    mainnet: { id: "0x1", name: "Ethereum", rpc: ["https://ethereum-rpc.publicnode.com", "https://eth.llamarpc.com", "https://rpc.ankr.com/eth"], logs: "https://gateway.tenderly.co/public/mainnet",
+      zto: "0xd782bdea4ef02a0bd391eb9089470c8080f0a68e", pepeo: "0x765956a7307222346b08fff681820a5d77e92028", pepeoBlock: 26149637, ztoName: "ZTO",
+      pm: "0x000000000004444c5dc75cB358380D2e3dE08A90", quoter: "0x52f0e24d1c21c8a0cb1e5a5dd6198556bd9e1203", ur: "0x0542093271a31f6fc1dadb232bd59eeb27de780f", stateView: "0x7ffe42c4a5deea5b0fec41c94c136cf115597227",
+      permit2: "0x000000000022D473030F116dDEE9F6B43aC78BA3", explorer: "https://etherscan.io", dex: "https://dexscreener.com/ethereum/" },
+    sepolia: { id: "0xaa36a7", name: "Sepolia", rpc: ["https://ethereum-sepolia-rpc.publicnode.com", "https://rpc.sepolia.org"], logs: "https://gateway.tenderly.co/public/sepolia",
+      zto: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14", pepeo: "0x0ce3157eac34eccdcff239738983976fabdefb2a", pepeoBlock: 9700000, ztoName: "WETH (ZTO stand-in)",
+      pm: "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543", quoter: "0x61b3f2011a92d183c7dbadbda940a7555ccf9227", ur: "0x3A9D48AB9751398BbFa63ad67599Bb04e4BdF98b", stateView: "0xe1dd9c3fa50edb962e442f60dfbc432e24537e4c",
+      permit2: "0x000000000022D473030F116dDEE9F6B43aC78BA3", explorer: "https://sepolia.etherscan.io", dex: "" },
+  }
+  const q = new URLSearchParams(location.search)
+  const LIVE = { ...CHAINS[q.get("chain") || CONFIG.chain], chainKey: q.get("chain") || CONFIG.chain, kiln: (q.get("kiln") || CONFIG.kiln).toLowerCase(), launcher: (q.get("launcher") || CONFIG.launcher).toLowerCase() }
+  const TIERS = [[0, 13000], [1, 10000], [3, 7500], [7, 5000], [12, 2500], [21, 0]], LP_FEE = 2000, D = 1_000_000
+  const SEL = { bid: "0x1998aeef", ask: "0x4a896384", reserve: "0xcd3293de", claims: "0xdcc59b6f", inventory: "0x15d52a5c", tierOf: "0xc8f74bb8", quoteBid: "0x2b4b1cd8", quoteAsk: "0x1c2d0d6e", sell2: "0xd79875eb", buy2: "0xd6febde8", sell: "0xe4849b32", buy: "0xd96a094a", seed: "0x95564837", collect: "0xe5225381",
+    balanceOf: "0x70a08231", allowance: "0xdd62ed3e", approve: "0x095ea7b3", getApproved: "0x081812fc", ownerOf: "0x6352211e", tokenURI: "0xc87b56dd", getSlot0: "0xc815641c", getLiquidity: "0xfa6793d5", quote: "0xaa9d21cb", execute: "0x3593564c", p2allow: "0x927da105", p2approve: "0x87517c45", launcherOf: "0xacf80e61" }
+  const TRANSFER = "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef", PASSED = "0xb93c744e99f61e183cbdadbfb91ac361e0c3112cb8f6d6415e2bfaa9c5024058"
+
+  const $ = (s, el = document) => el.querySelector(s)
+  const pad = (v) => BigInt(v).toString(16).padStart(64, "0")
+  const padAddr = (a) => a.replace(/^0x/, "").toLowerCase().padStart(64, "0")
+  const hexInt = (x) => BigInt(x === "0x" || !x ? "0x0" : x)
+  const u = (sel, ...args) => sel + args.map((a) => typeof a === "string" && a.startsWith("0x") && a.length === 42 ? padAddr(a) : pad(a)).join("")
+  const short = (a) => a ? `${a.slice(0, 6)}…${a.slice(-4)}` : "—"
+  const fmtZ = (wei, dp = 0) => { const n = Number(wei) / 1e18; return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}k` : n.toLocaleString("en-US", { maximumFractionDigits: n < 1 ? 6 : dp }) }
+  const fmtE = (wei) => (Number(wei) / 1e18).toLocaleString("en-US", { maximumFractionDigits: 6 })
+  const pct = (cut) => `${(cut / 10000).toFixed(2)}%`
+  const parseAmt = (s) => { if (!/^\d*\.?\d*$/.test(s) || s === "" || s === ".") return 0n; const [i, f = ""] = s.split("."); return BigInt(i || "0") * 10n ** 18n + BigInt((f + "0".repeat(18)).slice(0, 18)) }
+  const toastEl = $("#toast"); let toastT
+  const toast = (m, ms = 3200) => { toastEl.innerHTML = m; toastEl.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove("show"), ms) }
+
+  // ── minimal ABI encoder: static words, bytes, bytes[], tuples with dynamic members ──
+  const isDyn = (t) => t === "bytes" || t.endsWith("[]") || (t.startsWith("(") && splitTuple(t).some(isDyn))
+  function splitTuple(t) { const s = t.slice(1, -1); const out = []; let d = 0, cur = ""; for (const ch of s) { if (ch === "(") d++; if (ch === ")") d--; if (ch === "," && d === 0) { out.push(cur); cur = "" } else cur += ch } if (cur) out.push(cur); return out }
+  function encOne(t, v) {
+    if (t === "bytes") { const h = v.replace(/^0x/, ""); return pad(h.length / 2) + h.padEnd(Math.ceil(h.length / 64) * 64, "0") }
+    if (t.endsWith("[]")) { const inner = t.slice(0, -2); return pad(v.length) + enc(v.map(() => inner), v) }
+    if (t.startsWith("(")) return enc(splitTuple(t), v)
+    if (t === "address") return padAddr(v)
+    if (t === "bool") return pad(v ? 1 : 0)
+    if (t.startsWith("int")) { let b = BigInt(v); if (b < 0n) b += 1n << 256n; return pad(b) }
+    return pad(v)
+  }
+  function enc(types, values) { // abi.encode of a static/dynamic mix
+    const heads = [], tails = []; let tailOff = types.reduce((n, t) => n + (isDyn(t) ? 32 : 32 * wordsOf(t)), 0)
+    types.forEach((t, i) => { const e = encOne(t, values[i]); if (isDyn(t)) { heads.push(pad(tailOff)); tails.push(e); tailOff += e.length / 2 } else heads.push(e) })
+    return heads.join("") + tails.join("")
+  }
+  const wordsOf = (t) => t.startsWith("(") ? splitTuple(t).reduce((n, x) => n + wordsOf(x), 0) : 1
+  const POOLKEY_T = "(address,address,uint24,int24,address)"
+  const poolKey = () => [ "0x0000000000000000000000000000000000000000", LIVE.zto, LP_FEE, 60, LIVE.kiln ]
+  const poolId = () => "0x" + keccak(hexToBytes(enc(splitTuple(POOLKEY_T), poolKey())))
+
+  // ── keccak-256 (tiny, for the pool id) ──
+  function keccak(bytes) { const RC = [1n,0x8082n,0x800000000000808an,0x8000000080008000n,0x808bn,0x80000001n,0x8000000080008081n,0x8000000000008009n,0x8an,0x88n,0x80008009n,0x8000000an,0x8000808bn,0x800000000000008bn,0x8000000000008089n,0x8000000000008003n,0x8000000000008002n,0x8000000000000080n,0x800an,0x800000008000000an,0x8000000080008081n,0x8000000000008080n,0x80000001n,0x8000000080008008n]
+    const R = [0,1,62,28,27,36,44,6,55,20,3,10,43,25,39,41,45,15,21,8,18,2,61,56,14], M = (1n << 64n) - 1n, rot = (x, n) => ((x << BigInt(n)) | (x >> BigInt(64 - n))) & M
+    const s = new Array(25).fill(0n), rate = 136, msg = [...bytes, 1]; while (msg.length % rate) msg.push(0); msg[msg.length - 1] |= 0x80
+    for (let off = 0; off < msg.length; off += rate) { for (let i = 0; i < 17; i++) { let w = 0n; for (let b = 7; b >= 0; b--) w = (w << 8n) | BigInt(msg[off + i * 8 + b]); s[i] ^= w }
+      for (let r = 0; r < 24; r++) { const c = [0,1,2,3,4].map((x) => s[x] ^ s[x+5] ^ s[x+10] ^ s[x+15] ^ s[x+20]); for (let x = 0; x < 5; x++) { const d = c[(x+4)%5] ^ rot(c[(x+1)%5], 1); for (let y = 0; y < 25; y += 5) s[x+y] ^= d }
+        const b = new Array(25); for (let x = 0; x < 5; x++) for (let y = 0; y < 5; y++) { const i = x + 5*y; b[y + 5*((2*x+3*y)%5)] = R[i] ? rot(s[i], R[i]) : s[i] }
+        for (let y = 0; y < 25; y += 5) for (let x = 0; x < 5; x++) s[y+x] = b[y+x] ^ (~b[y+(x+1)%5] & b[y+(x+2)%5]); s[0] ^= RC[r] } }
+    let out = ""; for (let i = 0; i < 4; i++) { let w = s[i]; for (let b = 0; b < 8; b++) { out += (w & 0xffn).toString(16).padStart(2, "0"); w >>= 8n } } return out }
+  const hexToBytes = (h) => { h = h.replace(/^0x/, ""); const a = []; for (let i = 0; i < h.length; i += 2) a.push(parseInt(h.slice(i, i + 2), 16)); return a }
+
+  // ── rpc ──
+  let rpcAt = 0
+  async function post(body) { let last; for (let k = 0; k < LIVE.rpc.length; k++) { const url = LIVE.rpc[(rpcAt + k) % LIVE.rpc.length]; try { const r = await fetch(url, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(9000) }); if (!r.ok) throw new Error(`HTTP ${r.status}`); const j = await r.json(); rpcAt = (rpcAt + k) % LIVE.rpc.length; return j } catch (e) { last = e } } throw last || new Error("no RPC answered") }
+  async function rpc(method, params) { const j = await post({ jsonrpc: "2.0", id: 1, method, params }); if (j.error) throw new Error(j.error.message); return j.result }
+  async function calls(list) { const body = list.map(([to, data, from], i) => ({ jsonrpc: "2.0", id: i, method: "eth_call", params: [from ? { to, data, from } : { to, data }, "latest"] })); const j = await post(body); if (!Array.isArray(j)) throw new Error("bad batch"); return body.map((_, i) => { const x = j.find((y) => y.id === i); return x && !x.error ? x.result : null }) }
+
+  // ── state ──
+  const S = { bid: 0n, ask: 0n, qbid: 0n, qask: 0n, reserve: 0n, claims: 0n, inv: [], sqrtP: 0n, liq: 0n, ok: false, err: "" }
+  const wallet = { addr: null, eth: 0n, zto: 0n, pepes: 0, cut: 13000, mine: [], p2: 0n, p2ur: 0n, busy: "" }
+  const ui = { dir: "buy", sellSel: null, buySel: null, quoteOut: 0n }
+
+  async function readChain() {
+    if (!LIVE.kiln) { S.err = "The Kiln is not open yet. The fire is lit on Ethereum the moment the contract lands; this page will read it live."; render(); return }
+    try {
+      const K = LIVE.kiln, id = poolId()
+      const r = await calls([[K, SEL.bid], [K, SEL.ask], [K, SEL.reserve], [K, SEL.claims], [K, SEL.inventory], [LIVE.stateView, u(SEL.getSlot0, id)], [LIVE.stateView, u(SEL.getLiquidity, id)], [K, SEL.quoteBid], [K, SEL.quoteAsk], ...(wallet.addr ? [[K, u(SEL.tierOf, wallet.addr)], [LIVE.pepeo, u(SEL.balanceOf, wallet.addr)], [LIVE.zto, u(SEL.balanceOf, wallet.addr)], [LIVE.zto, u(SEL.allowance, wallet.addr, LIVE.permit2)], [LIVE.permit2, u(SEL.p2allow, wallet.addr, LIVE.zto, LIVE.ur)]] : [])])
+      S.bid = hexInt(r[0]); S.ask = hexInt(r[1]); S.reserve = hexInt(r[2]); S.claims = hexInt(r[3])
+      if (r[4]) { const h = r[4].slice(2); const n = Number(hexInt("0x" + h.slice(64, 128))); S.inv = Array.from({ length: n }, (_, i) => Number(hexInt("0x" + h.slice(128 + i * 64, 192 + i * 64)))).sort((a, b) => a - b) }
+      S.sqrtP = r[5] ? hexInt("0x" + r[5].slice(2, 66)) : 0n
+      S.liq = hexInt(r[6])
+      S.qbid = r[7] ? hexInt(r[7]) : S.bid; S.qask = r[8] ? hexInt(r[8]) : S.ask // execution prices incl. pending claims (mainnet Kiln); older builds fall back to bid/ask
+      if (wallet.addr) {
+        const t = r[9] || "0x" // mainnet tierOf returns (index, pepes, kilnCut); the Sepolia rehearsal returned kilnCut alone
+        wallet.cut = t.length > 130 ? Number(hexInt("0x" + t.slice(130, 194))) : Number(hexInt(t))
+        wallet.pepes = Number(hexInt(r[10])); wallet.zto = hexInt(r[11]); wallet.p2 = hexInt(r[12]); wallet.p2ur = r[13] ? hexInt("0x" + r[13].slice(2, 66)) : 0n; wallet.eth = hexInt(await rpc("eth_getBalance", [wallet.addr, "latest"])) }
+      S.ok = true; S.err = ""
+    } catch (e) { S.err = e.message || String(e) }
+    render()
+  }
+  async function readMine() { // pieces owned by the wallet: Transfer logs to it, then ownerOf
+    if (!wallet.addr) { wallet.mine = []; return }
+    try {
+      const j = await fetch(LIVE.logs, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_getLogs", params: [{ address: LIVE.pepeo, fromBlock: "0x" + LIVE.pepeoBlock.toString(16), toBlock: "latest", topics: [TRANSFER, null, "0x" + padAddr(wallet.addr)] }] }) }).then((r) => r.json())
+      const ids = [...new Set((j.result || []).map((l) => Number(hexInt(l.topics[3]))))]
+      if (!ids.length) { wallet.mine = []; renderMine(); return }
+      const own = await calls(ids.map((id) => [LIVE.pepeo, u(SEL.ownerOf, id)]))
+      wallet.mine = ids.filter((_, i) => own[i] && own[i].slice(-40) === wallet.addr.slice(2)).sort((a, b) => a - b)
+    } catch { wallet.mine = [] }
+    renderMine()
+  }
+
+  // ── wallet ──
+  const eth = () => window.ethereum
+  async function connect() {
+    if (!eth()) { const here = encodeURIComponent(location.href.replace(/^https?:\/\//, "")); return toast(`No wallet in this browser. Open this page inside one: <a href="https://metamask.app.link/dapp/${here}" target="_blank" rel="noreferrer">MetaMask</a> · <a href="https://go.cb-w.com/dapp?cb_url=${encodeURIComponent(location.href)}" target="_blank" rel="noreferrer">Coinbase Wallet</a> · <a href="https://link.rainbow.me/dapp/${here}" target="_blank" rel="noreferrer">Rainbow</a>`, 9000) }
+    const [a] = await eth().request({ method: "eth_requestAccounts" }); wallet.addr = a.toLowerCase()
+    try { await eth().request({ method: "wallet_switchEthereumChain", params: [{ chainId: LIVE.id }] }) } catch { toast(`Switch your wallet to ${LIVE.name}.`) }
+    eth().on?.("accountsChanged", (acc) => { wallet.addr = acc[0] ? acc[0].toLowerCase() : null; readChain(); readMine() })
+    await readChain(); readMine(); quote()
+  }
+  async function send(to, data, label, value) {
+    wallet.busy = label; render()
+    try {
+      const tx = { from: wallet.addr, to, data }; if (value) tx.value = "0x" + value.toString(16)
+      const hash = await eth().request({ method: "eth_sendTransaction", params: [tx] })
+      toast(`${label}: sent. Waiting for the chain…`, 2500)
+      let rec = null; for (let i = 0; i < 120 && !rec; i++) { await new Promise((r) => setTimeout(r, 2000)); rec = await rpc("eth_getTransactionReceipt", [hash]) }
+      if (!rec) throw new Error("still pending; check your wallet")
+      if (rec.status !== "0x1") throw new Error("the transaction reverted")
+      return rec
+    } catch (e) { const m = (e && (e.message || e.toString())) || "failed"; toast(`${label}: ${m.length > 140 ? m.slice(0, 140) + "…" : m}`, 6000); return null }
+    finally { wallet.busy = ""; render() }
+  }
+
+  // ── swap ──
+  const inEl = $("#in"), outEl = $("#out")
+  let quoteT
+  async function quote() {
+    const amt = parseAmt(inEl.value); ui.quoteOut = 0n
+    if (!amt || !LIVE.kiln) { outEl.value = ""; renderFee(); return }
+    try {
+      const zeroForOne = ui.dir === "buy"
+      const params = enc(["(" + POOLKEY_T + ",bool,uint128,bytes)"], [[poolKey(), zeroForOne, amt, "0x"]])
+      const r = await calls([[LIVE.quoter, SEL.quote + params, wallet.addr || "0x000000000000000000000000000000000000dEaD"]]) // a real-looking origin: the hook reads the signer's Pepeolithic count and ERC-721 balanceOf(0) reverts
+      if (!r[0]) throw new Error("no quote (pool empty on that side?)")
+      ui.quoteOut = hexInt("0x" + r[0].slice(2, 66))
+      outEl.value = zeroForOne ? fmtZ(ui.quoteOut, 0) : fmtE(ui.quoteOut)
+      $("#swaperr").textContent = ""
+    } catch (e) { outEl.value = ""; $("#swaperr").textContent = e.message.includes("revert") || e.message.includes("empty") ? "No liquidity on that side yet. Buyers must leave ETH before anyone can sell." : e.message }
+    renderFee()
+  }
+  inEl.addEventListener("input", () => { clearTimeout(quoteT); quoteT = setTimeout(quote, 350) })
+  $("#flip").addEventListener("click", () => { ui.dir = ui.dir === "buy" ? "sell" : "buy"; inEl.value = ""; outEl.value = ""; ui.quoteOut = 0n; render() })
+  async function doSwap() {
+    if (!wallet.addr) return connect()
+    const amt = parseAmt(inEl.value); if (!amt || !ui.quoteOut) return
+    const zeroForOne = ui.dir === "buy", minOut = (ui.quoteOut * 99n) / 100n
+    const ETH0 = "0x0000000000000000000000000000000000000000", cIn = zeroForOne ? ETH0 : LIVE.zto, cOut = zeroForOne ? LIVE.zto : ETH0
+    if (!zeroForOne) {
+      if (wallet.p2 < amt) { const ok = await send(LIVE.zto, u(SEL.approve, LIVE.permit2, (1n << 256n) - 1n), "Approve ZTO for Permit2"); if (!ok) return }
+      if (wallet.p2ur < amt) { const ok = await send(LIVE.permit2, u(SEL.p2approve, LIVE.zto, LIVE.ur, (1n << 160n) - 1n, (1n << 48n) - 1n), "Allow the router (Permit2)"); if (!ok) return }
+    }
+    // V4 actions: SWAP_EXACT_IN_SINGLE(0x06), SETTLE_ALL(0x0c), TAKE_ALL(0x0f)
+    const swapP = enc(["(" + POOLKEY_T + ",bool,uint128,uint128,uint256,bytes)"], [[poolKey(), zeroForOne, amt, minOut, 0, "0x"]]) // V2.1.1+ struct: minHopPriceX36 (0 = no limit) sits before hookData
+    const settle = enc(["address", "uint256"], [cIn, amt]), take = enc(["address", "uint256"], [cOut, minOut])
+    const v4 = "0x" + enc(["bytes", "bytes[]"], ["0x060c0f", ["0x" + swapP, "0x" + settle, "0x" + take]])
+    const deadline = Math.floor(Date.now() / 1000) + 600
+    const data = SEL.execute + enc(["bytes", "bytes[]", "uint256"], ["0x10", [v4], deadline]) // command 0x10 = V4_SWAP
+    const rec = await send(LIVE.ur, data, zeroForOne ? "Buy ZTO" : "Sell ZTO", zeroForOne ? amt : 0n)
+    if (rec) {
+      const p = (rec.logs || []).find((l) => l.address.toLowerCase() === LIVE.kiln && l.topics[0] === PASSED)
+      const taken = p ? hexInt("0x" + p.data.slice(2 + 128, 2 + 192)) : 0n
+      toast(`Done. ${p ? `Pass: ${Number(hexInt("0x" + p.data.slice(2, 66)))} Pepeolithic, Kiln cut ${pct(Number(hexInt("0x" + p.data.slice(66, 130))))} = ${fmtZ(taken, 2)} ZTO to the fire.` : ""} <a href="${LIVE.explorer}/tx/${rec.transactionHash}" target="_blank" rel="noreferrer">tx</a>`, 9000)
+      inEl.value = ""; outEl.value = ""; ui.quoteOut = 0n; fed(); readChain()
+    }
+  }
+  $("#swapbtn").addEventListener("click", doSwap)
+
+  // ── kiln: sell / buy / collect / seed ──
+  async function doSell() {
+    if (!wallet.addr) return connect()
+    const id = ui.sellSel ?? ($("#sellid").value.trim() === "" ? null : Number($("#sellid").value))
+    if (id == null || Number.isNaN(id)) return ($("#sellerr").textContent = "Pick one of your pieces or type an id.")
+    if (S.bid === 0n) return ($("#sellerr").textContent = "The Kiln's bid is zero right now; nothing to sell into.")
+    $("#sellerr").textContent = ""
+    const [own, appr] = await calls([[LIVE.pepeo, u(SEL.ownerOf, id)], [LIVE.pepeo, u(SEL.getApproved, id)]])
+    if (!own || own.slice(-40) !== wallet.addr.slice(2)) return ($("#sellerr").textContent = `You do not hold #${id}.`)
+    if (!appr || appr.slice(-40) !== LIVE.kiln.slice(2)) { const ok = await send(LIVE.pepeo, u(SEL.approve, LIVE.kiln, id), `Approve #${id}`); if (!ok) return }
+    const bounded = LIVE.chainKey === "mainnet" // bounded variants exist on the mainnet Kiln only
+    const rec = await send(LIVE.kiln, bounded ? u(SEL.sell2, id, (S.qbid * 99n) / 100n) : u(SEL.sell, id), `Sell #${id} to the Kiln`)
+    if (rec) { toast(`Sold #${id} to the fire for about ${fmtZ(S.qbid, 0)} ZTO. <a href="${LIVE.explorer}/tx/${rec.transactionHash}" target="_blank" rel="noreferrer">tx</a>`, 8000); ui.sellSel = null; $("#sellid").value = ""; fed(); readChain(); readMine() }
+  }
+  async function doBuy() {
+    if (!wallet.addr) return connect()
+    const id = ui.buySel; if (id == null) return
+    const price = S.qask
+    if (wallet.zto < price) return ($("#buyerr").textContent = `You need ${fmtZ(price, 0)} ZTO; you hold ${fmtZ(wallet.zto, 0)}.`)
+    $("#buyerr").textContent = ""
+    const [al] = await calls([[LIVE.zto, u(SEL.allowance, wallet.addr, LIVE.kiln)]])
+    if (hexInt(al) < price) { const ok = await send(LIVE.zto, u(SEL.approve, LIVE.kiln, (price * 102n) / 100n), "Approve ZTO for the Kiln"); if (!ok) return }
+    const rec = await send(LIVE.kiln, LIVE.chainKey === "mainnet" ? u(SEL.buy2, id, (price * 101n) / 100n) : u(SEL.buy, id), `Buy #${id} from the Kiln`)
+    if (rec) { toast(`#${id} is yours. <a href="${LIVE.explorer}/tx/${rec.transactionHash}" target="_blank" rel="noreferrer">tx</a>`, 8000); ui.buySel = null; fed(); readChain(); readMine() }
+  }
+  async function doCollect() { if (!wallet.addr) return connect(); const rec = await send(LIVE.kiln, SEL.collect, "Collect into the reserve"); if (rec) { toast("Collected. The bid just moved."); fed(); readChain() } }
+  async function doSeed() {
+    if (!wallet.addr) return connect()
+    const amt = parseAmt($("#seedamt").value); if (!amt) return
+    if (!confirm(`Seed ${fmtZ(amt, 0)} ZTO into the Kiln? This cannot be undone by anyone.`)) return
+    const [al] = await calls([[LIVE.zto, u(SEL.allowance, wallet.addr, LIVE.kiln)]])
+    if (hexInt(al) < amt) { const ok = await send(LIVE.zto, u(SEL.approve, LIVE.kiln, amt), "Approve ZTO for the Kiln"); if (!ok) return }
+    const rec = await send(LIVE.kiln, u(SEL.seed, amt), "Seed the fire"); if (rec) { toast("The fire is bigger."); $("#seedamt").value = ""; fed(); readChain() }
+  }
+  $("#sellbtn").addEventListener("click", doSell); $("#buybtn").addEventListener("click", doBuy); $("#collectbtn").addEventListener("click", doCollect); $("#seedbtn").addEventListener("click", doSeed)
+  $("#sellid").addEventListener("input", () => { ui.sellSel = null; renderMine() })
+  $("#navwallet").addEventListener("click", connect)
+
+  // ── piece pictures: tokenURI(id) → …/NN.json; the cave sites keep a 512-px JPEG beside every record with the same name ──
+  const pics = {}
+  async function loadPics(ids) {
+    const want = ids.filter((id) => !(id in pics)); if (!want.length) return
+    try {
+      const r = await calls(want.map((id) => [LIVE.pepeo, u(SEL.tokenURI, id)]))
+      want.forEach((id, i) => { const h = r[i]; if (!h || h.length < 130) { pics[id] = null; return } const len = Number(hexInt("0x" + h.slice(66, 130))); const bytes = h.slice(130, 130 + len * 2); let str = ""; for (let j = 0; j < bytes.length; j += 2) str += String.fromCharCode(parseInt(bytes.slice(j, j + 2), 16)); pics[id] = str.replace(/\.json$/, ".jpg") })
+    } catch { want.forEach((id) => { pics[id] = null }) }
+    render()
+  }
+  const tile = (id, price, sel, verb) => `<button class="tile2 ${sel ? "sel" : ""}" data-id="${id}"><div class="pic q">${pics[id] ? `<img src="${pics[id]}" alt="" loading="lazy" onload="this.parentNode.classList.remove('q')" onerror="this.remove()">` : ""}</div><div class="cap">#${id}<span>${verb} ${price}</span></div><a class="os" href="https://opensea.io/assets/${LIVE.chainKey === "mainnet" ? "ethereum" : "sepolia"}/${LIVE.pepeo}/${id}" target="_blank" rel="noreferrer" onclick="event.stopPropagation()">OS</a></button>`
+
+  // ── render ──
+  const cutFor = (pepes) => TIERS.reduce((c, [min, cut]) => pepes >= min ? cut : c, 13000)
+  function renderFee() {
+    const cut = wallet.addr ? wallet.cut : 13000
+    $("#feecut").textContent = pct(cut); $("#feetot").textContent = pct(cut + LP_FEE)
+    $("#feewhy").textContent = wallet.addr ? `(${wallet.pepes} Pepeolithic)` : "(no wallet: 0 Pepeolithic)"
+    $("#minout").textContent = ui.quoteOut ? (ui.dir === "buy" ? `${fmtZ((ui.quoteOut * 99n) / 100n, 0)} ZTO` : `${fmtE((ui.quoteOut * 99n) / 100n)} ETH`) : "—"
+    const amt = parseAmt(inEl.value), can = wallet.addr && amt > 0n && ui.quoteOut > 0n && !wallet.busy
+    $("#swapbtn").textContent = !LIVE.kiln ? "Opens with the Kiln" : wallet.busy ? wallet.busy + "…" : !wallet.addr ? "Connect wallet" : !amt ? "Enter an amount" : !ui.quoteOut ? "No quote" : ui.dir === "buy" ? "Buy ZTO" : "Sell ZTO"
+    $("#swapbtn").disabled = !LIVE.kiln || (!!wallet.addr && !can)
+  }
+  function renderMine() {
+    const el = $("#mine")
+    if (!wallet.addr) { el.innerHTML = `<span class="dim" style="font-size:13px;grid-column:1/-1">Connect a wallet to see your pieces.</span>`; return }
+    if (!wallet.mine.length) { el.innerHTML = `<span class="dim" style="font-size:13px;grid-column:1/-1">No Pepeolithic in this wallet${wallet.pepes ? " that this page can list; type the id below" : ""}.</span>`; return }
+    el.innerHTML = wallet.mine.map((id) => tile(id, fmtZ(S.qbid, 0), ui.sellSel === id, "sell")).join("")
+    el.querySelectorAll("button.tile2").forEach((b) => b.addEventListener("click", () => { ui.sellSel = Number(b.dataset.id); $("#sellid").value = ""; renderMine() }))
+    loadPics(wallet.mine)
+    $("#sellbtn").textContent = ui.sellSel != null ? `Sell #${ui.sellSel} for ${fmtZ(S.qbid, 0)} ZTO` : "Sell to the Kiln"
+  }
+  function render() {
+    const price = S.sqrtP ? (Number(S.sqrtP) / 2 ** 96) ** 2 : 0 // ZTO per ETH
+    popIfChanged("#s-bid", S.ok ? fmtZ(S.qbid, 0) : "—"); popIfChanged("#s-ask", S.ok ? fmtZ(S.qask, 0) : "—")
+    popIfChanged("#s-reserve", S.ok ? `${fmtZ(S.reserve, 0)}` : "—"); $("#s-inv").textContent = S.ok ? String(S.inv.length) : "—"
+    $("#s-fee").textContent = pct((wallet.addr ? wallet.cut : 13000) + LP_FEE)
+    $("#p-price").textContent = price ? `${price.toLocaleString("en-US", { maximumFractionDigits: 0 })} ZTO / ETH` : !LIVE.kiln ? "not open yet" : S.err ? "—" : "loading…"
+    const sp = Number(S.sqrtP) / 2 ** 96, L = Number(S.liq)
+    const ztoDepth = L * sp * (1 - Math.sqrt(0.9)), ethDepth = sp ? L * (1 / sp) * (1 - 1 / Math.sqrt(1.1)) : 0 // buyers push the price (ZTO per ETH) down, sellers push it up
+    $("#p-zto").textContent = S.ok ? `${fmtZ(BigInt(Math.floor(ztoDepth)), 0)} ZTO` : "—"; $("#p-eth").textContent = S.ok ? `${fmtE(BigInt(Math.floor(ethDepth)))} ETH` : "—"
+    $("#p-hook").innerHTML = LIVE.kiln ? `<a href="${LIVE.explorer}/address/${LIVE.kiln}" target="_blank" rel="noreferrer">${short(LIVE.kiln)}</a>` : "—"
+    $("#p-id").textContent = LIVE.kiln ? short(poolId()) : "—"
+    $("#dexlink").innerHTML = LIVE.dex && LIVE.kiln ? `Chart: <a href="${LIVE.dex}${poolId()}" target="_blank" rel="noreferrer">DexScreener</a>` : ""
+    $("#k-reserve").textContent = S.ok ? `${fmtZ(S.reserve, 0)} ZTO` : "—"; $("#k-claims").textContent = S.ok ? `${fmtZ(S.claims, 2)} ZTO` : "—"; $("#k-count").textContent = S.ok ? String(S.inv.length) : "—"
+    $("#sellbid").textContent = `bid ${S.ok ? fmtZ(S.qbid, 0) : "—"} ZTO`; $("#buyask").textContent = `ask ${S.ok ? fmtZ(S.qask, 0) : "—"} ZTO`
+    $("#swapdot").className = "dot" + (S.ok ? "" : " off"); $("#kilndot").className = "dot" + (S.ok ? "" : " off")
+    const inv = $("#inventory")
+    inv.innerHTML = !S.ok ? `<span class="dim" style="font-size:13px;grid-column:1/-1">${S.err || "Loading…"}</span>` : S.inv.length ? S.inv.map((id) => tile(id, fmtZ(S.qask, 0), ui.buySel === id, "buy")).join("") : `<span class="dim" style="font-size:13px;grid-column:1/-1">Empty. Nobody has sold to the fire yet. The first seller stocks it.</span>`
+    inv.querySelectorAll("button.tile2").forEach((b) => b.addEventListener("click", () => { ui.buySel = Number(b.dataset.id); render() }))
+    if (S.ok && S.inv.length) loadPics(S.inv)
+    $("#buybtn").disabled = ui.buySel == null || !!wallet.busy; $("#buybtn").textContent = wallet.busy ? wallet.busy + "…" : ui.buySel != null ? `Buy #${ui.buySel} for ${fmtZ(S.qask, 0)} ZTO` : "Pick a piece"
+    $("#collectbtn").disabled = !!wallet.busy || S.claims === 0n; $("#collectbtn").textContent = S.claims > 0n ? `Collect ${fmtZ(S.claims, 2)}` : "Nothing to collect"
+    $("#sellbtn").textContent = !LIVE.kiln ? "Opens with the Kiln" : wallet.busy ? wallet.busy + "…" : !wallet.addr ? "Connect wallet" : ui.sellSel != null ? `Sell #${ui.sellSel} for ${fmtZ(S.qbid, 0)} ZTO` : "Sell to the Kiln"; $("#sellbtn").disabled = !LIVE.kiln || !!wallet.busy
+    $("#navwallet").textContent = wallet.addr ? `${short(wallet.addr)} · ${wallet.pepes} Pepeolithic` : "Connect wallet"
+    $("#swapme").textContent = wallet.addr ? `${wallet.pepes} Pepeolithic · ${pct(wallet.cut + LP_FEE)} fee` : "no wallet · 1.50% fee"; $("#swapme").className = "pill" + (wallet.addr && wallet.cut < 13000 ? " hot" : "")
+    document.querySelectorAll("#tiers tr[data-t]").forEach((tr) => tr.classList.toggle("me", wallet.addr && Number(tr.dataset.t) === TIERS.find(([, c]) => c === wallet.cut)?.[0]))
+    const zt = LIVE.ztoName; $("#intok").textContent = ui.dir === "buy" ? "ETH" : zt; $("#outtok").textContent = ui.dir === "buy" ? zt : "ETH"
+    $("#inbal").innerHTML = wallet.addr ? `balance ${ui.dir === "buy" ? fmtE(wallet.eth) + " ETH" : fmtZ(wallet.zto, 0) + " " + zt} <button id="max">max</button>` : ""; $("#outbal").textContent = wallet.addr ? `balance ${ui.dir === "buy" ? fmtZ(wallet.zto, 0) + " " + zt : fmtE(wallet.eth) + " ETH"}` : ""
+    $("#max")?.addEventListener("click", () => { const v = ui.dir === "buy" ? (wallet.eth > 10n ** 15n ? wallet.eth - 10n ** 15n : 0n) : wallet.zto; inEl.value = (Number(v) / 1e18).toString(); quote() })
+    $("#a-kiln").innerHTML = LIVE.kiln ? `<a href="${LIVE.explorer}/address/${LIVE.kiln}" target="_blank" rel="noreferrer">${LIVE.kiln}</a>` : "announced on launch"
+    $("#a-launcher").innerHTML = LIVE.launcher ? `<a href="${LIVE.explorer}/address/${LIVE.launcher}" target="_blank" rel="noreferrer">${LIVE.launcher}</a>` : "—"
+    $("#a-zto").innerHTML = `<a href="${LIVE.explorer}/token/${LIVE.zto}" target="_blank" rel="noreferrer">${LIVE.zto}</a>`; $("#a-pepeo").innerHTML = `<a href="${LIVE.explorer}/address/${LIVE.pepeo}" target="_blank" rel="noreferrer">${LIVE.pepeo}</a>`; $("#a-pm").textContent = LIVE.pm
+    $("#a-repo").href = CONFIG.repo
+    $("#f-zto").textContent = `ZTO · ${LIVE.zto} · ${LIVE.name}`; $("#f-kiln").textContent = LIVE.kiln ? `Kiln · ${LIVE.kiln} · ${LIVE.name}` : "Kiln · address announced on launch · trust only the address in the bio"
+    $("#chainpill").textContent = `ZTO · ${LIVE.name}${LIVE.chainKey !== "mainnet" ? " · rehearsal" : LIVE.kiln ? "" : " · opening soon"}`
+    renderFee(); renderMine()
+  }
+
+  // ── juice: embers on clicks, numbers that pop when they move, the fire flares when it is fed ──
+  const still = matchMedia("(prefers-reduced-motion: reduce)").matches
+  let lastPt = { x: innerWidth / 2, y: innerHeight * .6 }
+  addEventListener("pointerdown", (e) => { lastPt = { x: e.clientX, y: e.clientY } }, { passive: true, capture: true })
+  function sparks(x = lastPt.x, y = lastPt.y, n = 12) {
+    if (still) return
+    const host = document.createElement("div"); host.className = "sparks"; host.style.left = x + "px"; host.style.top = y + "px"
+    host.innerHTML = Array.from({ length: n }, () => { const a = Math.random() * Math.PI * 2, d = 40 + Math.random() * 90; return `<i style="--x:${Math.cos(a) * d}px;--y:${Math.sin(a) * d - 60}px;--s:${3 + Math.random() * 4}px;--t:${.6 + Math.random() * .5}s"></i>` }).join("")
+    document.body.appendChild(host); setTimeout(() => host.remove(), 1200)
+  }
+  function fed() { // a trade landed: the hero flares, embers rise from the bottom, the fire stats pop
+    if (still) return
+    $("#hero").classList.remove("fed"); void $("#hero").offsetWidth; $("#hero").classList.add("fed")
+    for (let i = 0; i < 5; i++) setTimeout(() => sparks(innerWidth * (.2 + Math.random() * .6), innerHeight - 10, 16), i * 120)
+    for (const id of ["#s-reserve", "#s-bid", "#k-reserve"]) { const el = $(id); el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop") }
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest?.(".btn, .chip, .wchip, .tile2, .flip button")) sparks(e.clientX, e.clientY, 10) })
+  const shown = {}
+  function popIfChanged(id, text) { const el = $(id); if (shown[id] !== undefined && shown[id] !== text && !still) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop") } shown[id] = text; el.textContent = text }
+
+  // ── atmosphere ──
+  const glow = $("#glow"), torch = $("#torch")
+  addEventListener("pointermove", (e) => { glow.style.setProperty("--gx", e.clientX + "px"); glow.style.setProperty("--gy", e.clientY + "px"); const r = $("#hero").getBoundingClientRect(); torch.style.setProperty("--mx", ((e.clientX - r.left) / r.width * 100) + "%"); torch.style.setProperty("--my", ((e.clientY - r.top) / r.height * 100) + "%") }, { passive: true })
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) $("#embers").innerHTML = Array.from({ length: 26 }, (_, i) => `<i style="--l:${(i * 37) % 100}%;--s:${2 + (i % 4)}px;--d:${6 + (i % 7)}s;--w:${(i * .7) % 6}s;--x:${(i % 2 ? 1 : -1) * (20 + (i * 13) % 90)}px"></i>`).join("")
+  const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add("in")), { threshold: .12 }); document.querySelectorAll(".reveal").forEach((el) => io.observe(el))
+  setTimeout(() => document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in")), 1800) // never leave content hidden (print, headless, odd scrollers)
+
+  render(); readChain(); setInterval(readChain, 20000)
+})()
+</script>
+</body>
+</html>
